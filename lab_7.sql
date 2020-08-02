@@ -17,8 +17,8 @@ AS
         to_char(EXTRACT(YEAR FROM current_date) - EXTRACT(YEAR FROM child_birht_day))
         || '-'
         || to_char(EXTRACT(YEAR FROM current_date) - EXTRACT(YEAR FROM child_birht_day) + 1)            age_range,
-        COUNT(s.service)                                                                                quantity_services,
-        COUNT(s.service) * s.service_cost                                                               total_revenue
+        COUNT(distinct sa.attendance_num)                                                                                quantity_services,
+       COUNT(distinct sa.attendance_num) * s.service_cost                                                               total_revenue
     FROM
              sa_attendances sa
         INNER JOIN sa_contracts     ch ON ch.child_lastname = sa.child_lastname
@@ -42,8 +42,7 @@ AS
         child_birht_day
     );
 
-EXECUTE dbms_mview.refresh('REVENUE_MM', '?', '', true, false,
-                          0, 0, 0, false, false);
+EXECUTE dbms_mview.refresh('REVENUE_MM', '?', '', true, false,0, 0, 0, false, false);
 /*(list of mat.views,refresh method: ?-forse,rollback segment to use,refresh
 after errors:true,replication process for warehouse:false,0,0,0;atomic refresh:
 false;out_of_place refresh: false(works with method)*/
@@ -55,25 +54,21 @@ CREATE MATERIALIZED VIEW revenue_dd
         COMPLETE
         ON COMMIT
 AS
-    SELECT
-        k.country,
-        k.kindergarten,
+    SELECT 
+        sa.kindergarten,
         sa.service,
-        COUNT(sa.service) quantity_services
+        COUNT( sa.attendance_num) quantity_services
     FROM
              sa_attendances sa
-        INNER JOIN sa_contracts     ch ON ch.child_lastname = sa.child_lastname
-                                      AND ch.child_name = sa.child_name
-        INNER JOIN sa_kindergarten  k ON k.kindergarten = sa.kindergarten
     GROUP BY
-        k.country,
-        k.kindergarten,
+        sa.kindergarten,
         sa.service;
 
 CREATE MATERIALIZED VIEW model_report
     REFRESH
         COMPLETE
         ON DEMAND
+        START WITH SYSDATE NEXT (current_timestamp + 1/720)
 ENABLE QUERY REWRITE AS
     SELECT DISTINCT
         country,
@@ -104,3 +99,5 @@ ENABLE QUERY REWRITE AS
             )
         ]= SUM ( quantity_services )[cv(country)]);
 
+SELECT mv_name,collection_level,retention_period 
+FROM DBA_MVREF_STATS_PARAMS;
