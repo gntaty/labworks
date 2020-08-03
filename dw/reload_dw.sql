@@ -7,4 +7,5 @@ BEGIN
    pkg_load_dw_serv.load_dw_types;
    pkg_load_dw_serv.load_dw_serv_scd;
    pkg_load_dw_child.load_dw_child;
+   pkg_etl_dw_fact.etl_dw_fact;
 END;
