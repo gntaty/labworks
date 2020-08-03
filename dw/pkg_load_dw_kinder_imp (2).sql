@@ -6,14 +6,12 @@ WHERE
             upper(kindergarten_desc)
         FROM
             dw_ls_groups
-    );MERGE INTO t_kindergarten k using (
+    ); 
+    MERGE INTO t_kindergarten k using (
     SELECT DISTINCT
         upper(kindergarten_desc) AS k_desc
     FROM
             dw_ls_groups
-        order
-    BY
-        k_desc
 ) ck ON ( k.kindergarten_desc = ck.k_desc )
 WHEN NOT MATCHED THEN
 INSERT (
