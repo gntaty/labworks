@@ -2,9 +2,9 @@ CREATE OR REPLACE PACKAGE BODY pkg_load_dw_child AS
 
     PROCEDURE load_dw_child AS
     BEGIN
-        EXECUTE IMMEDIATE 'TRUNCATE TABLE DIM_EMPLOYEES';
+        EXECUTE IMMEDIATE 'TRUNCATE TABLE t_children';
       --Extract data
-                    INSERT INTO t_children (
+                            INSERT INTO t_children (
             child_id,
             date_of_contract,
             contract_num,
@@ -39,7 +39,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_load_dw_child AS
                 dw_cl_children;
 
       --Commit Data
-                COMMIT;
+                        COMMIT;
     END load_dw_child;
 
 END pkg_load_dw_child;
