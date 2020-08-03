@@ -7,6 +7,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_etl_dim_loc AS
         MERGE INTO dim_locations trg
         USING (
                   SELECT DISTINCT
+                      address_id,
                       address,
                       city,
                       country_id,
@@ -33,6 +34,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_etl_dim_loc AS
         WHEN NOT MATCHED THEN
         INSERT (
             location_id,
+            address_id,
             street,
             city,
             country_id,
@@ -54,6 +56,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_etl_dim_loc AS
             update_dt )
         VALUES
             ( loc_id_seq.NEXTVAL,
+            cls.address_id,
             cls.address,
             cls.city,
             cls.country_id,
