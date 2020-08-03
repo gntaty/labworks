@@ -71,9 +71,9 @@ TABLESPACE ts_cleansing;
 CREATE TABLE dw_ls_groups (
     group_num          NUMBER NOT NULL,
     group_desc         NVARCHAR2(50) NOT NULL, --kindergarten_groups
-    group_scale        NUMBER(*, 0) NOT NULL,
+            group_scale        NUMBER(*, 0) NOT NULL,
     kindergarten_desc  NVARCHAR2(50) NOT NULL,--kindergarten
-    address            NVARCHAR2(100) NOT NULL,
+            address            NVARCHAR2(100) NOT NULL,
     city               NVARCHAR2(50) NOT NULL,
     country            NVARCHAR2(50) NOT NULL
 )
@@ -82,50 +82,60 @@ TABLESPACE ts_cleansing;
 CREATE TABLE dw_ls_md_groups (
     group_num          NUMBER NOT NULL,
     group_desc         NVARCHAR2(50) NOT NULL, --kindergarten_groups
-    group_scale        NUMBER(*, 0) NOT NULL,
+            group_scale        NUMBER(*, 0) NOT NULL,
     kindergarten_desc  NVARCHAR2(50) NOT NULL,--kindergarten
-    address            NVARCHAR2(100) NOT NULL,
+            address            NVARCHAR2(100) NOT NULL,
     city               NVARCHAR2(50) NOT NULL,
     country            NVARCHAR2(50) NOT NULL
 )
 TABLESPACE ts_cleansing;
 
 CREATE TABLE dw_ls_services (
-    start_date    DATE,
+    service_code  NUMBER NOT NULL,
     service_desc  NVARCHAR2(50) NOT NULL,--service
-    type_desc     NVARCHAR2(50) NOT NULL,--type
-    service_cost  FLOAT NOT NULL
+            type_desc     NVARCHAR2(50) NOT NULL,--type
+            service_cost  FLOAT NOT NULL
 )
 TABLESPACE ts_cleansing;
 
 CREATE TABLE dw_ls_md_services (
-    start_date    DATE,
+    service_code  NUMBER NOT NULL,
     service_desc  NVARCHAR2(50) NOT NULL,--service
-    type_desc     NVARCHAR2(50) NOT NULL,--type
-    service_cost  FLOAT NOT NULL
+            type_desc     NVARCHAR2(50) NOT NULL,--type
+            service_cost  FLOAT NOT NULL
 )
 TABLESPACE ts_cleansing;
 
 CREATE TABLE dw_ls_attendances (
+    attendance_num     NUMBER NOT NULL,
     date_attendance    DATE NOT NULL,
+    child_contract     NUMBER NOT NULL,
     child_name         NVARCHAR2(50) NOT NULL,
     child_lastname     NVARCHAR2(50) NOT NULL,
+    emp_contract       NUMBER NOT NULL,
     emp_name           NVARCHAR2(50) NOT NULL,
     emp_lastname       NVARCHAR2(50) NOT NULL,
+    group_num          NUMBER NOT NULL,
     group_desc         NVARCHAR2(50) NOT NULL,
     kindergarten_desc  NVARCHAR2(50) NOT NULL,
-    service_desc       NVARCHAR2(50) NOT NULL
+    country            NVARCHAR2(50) NOT NULL,
+    service_code       NVARCHAR2(50) NOT NULL
 )
 TABLESPACE ts_cleansing;
 
 CREATE TABLE dw_ls_md_attendances (
+    attendance_num     NUMBER NOT NULL,
     date_attendance    DATE NOT NULL,
+    child_contract     NUMBER NOT NULL,
     child_name         NVARCHAR2(50) NOT NULL,
     child_lastname     NVARCHAR2(50) NOT NULL,
+    emp_contract       NUMBER NOT NULL,
     emp_name           NVARCHAR2(50) NOT NULL,
     emp_lastname       NVARCHAR2(50) NOT NULL,
+    group_num          NUMBER NOT NULL,
     group_desc         NVARCHAR2(50) NOT NULL,
     kindergarten_desc  NVARCHAR2(50) NOT NULL,
+    country            NVARCHAR2(50) NOT NULL,
     service_desc       NVARCHAR2(50) NOT NULL
 )
 TABLESPACE ts_cleansing;

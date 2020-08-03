@@ -1,110 +1,136 @@
-drop table T_CHILDREN;
-drop table T_EMPLOYEES;
-drop table T_KINDERGARTEN;
-drop table T_GROUPS;
-drop table  T_TYPES;
-drop table  T_SERVICES_SCD;
-drop table  T_SERVICES;
+DROP TABLE t_children;
+
+DROP TABLE t_employees;
+
+DROP TABLE t_kindergarten;
+
+DROP TABLE t_groups;
+
+DROP TABLE t_types;
+
+DROP TABLE t_services_scd;
+
+DROP TABLE t_services;
 --drop table  T_ATTENDANCES;
-drop table  T_LINKS_KID_GROUPS;
-drop table  T_LINKS_SERVICE_TYPES;
-DROP SEQUENCE DW_KINDERGARTEN_ID_seq; 
-DROP SEQUENCE DW_TYPE_ID_seq ;
-DROP SEQUENCE DW_children_id_seq; 
-DROP SEQUENCE DW_group_id_seq ;
-DROP SEQUENCE DW_employee_id_seq ;
-DROP SEQUENCE DW_service_id_seq; 
+DROP TABLE t_links_kid_groups;
 
+DROP TABLE t_links_service_types;
 
-CREATE TABLE T_CHILDREN(	
-CHILD_ID        NUMBER          NOT NULL,
-DATE_OF_CONTRACT DATE            NOT NULL,
-CONTRACT_NUM    NUMBER          NOT NULL,
-FIRST_NAME      NVARCHAR2(50)   NOT NULL,
-LAST_NAME       NVARCHAR2(50)   NOT NULL,
-GENDER          CHAR(6)         NOT NULL,
-PARENT_NAME_1   NVARCHAR2(50)   NOT NULL,
-PARENT_LASTNAME_1   NVARCHAR2(50)   NOT NULL,
-PARENT_NAME_2   NVARCHAR2(50)   NULL,
-PARENT_LASTNAME_2   NVARCHAR2(50)   NULL,
-DATE_OF_BIRTH   DATE            NOT NULL,
-PHONE_NUMBER    NVARCHAR2(50)   NULL,
-INSERT_DT       TIMESTAMP        NOT NULL, 
-UPDATE_DT       TIMESTAMP        NOT NULL,
-CONSTRAINT DW_CHILD_PKEY PRIMARY KEY (CHILD_ID))
+DROP SEQUENCE dw_kindergarten_id_seq;
+
+DROP SEQUENCE dw_type_id_seq;
+
+DROP SEQUENCE dw_children_id_seq;
+
+DROP SEQUENCE dw_group_id_seq;
+
+DROP SEQUENCE dw_employee_id_seq;
+
+DROP SEQUENCE dw_service_id_seq;
+
+CREATE TABLE t_children (
+    child_id           NUMBER NOT NULL,
+    date_of_contract   DATE NOT NULL,
+    contract_num       NUMBER NOT NULL,
+    first_name         NVARCHAR2(50) NOT NULL,
+    last_name          NVARCHAR2(50) NOT NULL,
+    gender             CHAR(6) NOT NULL,
+    parent_name_1      NVARCHAR2(50) NOT NULL,
+    parent_lastname_1  NVARCHAR2(50) NOT NULL,
+    parent_name_2      NVARCHAR2(50) NULL,
+    parent_lastname_2  NVARCHAR2(50) NULL,
+    date_of_birth      DATE NOT NULL,
+    phone_number       NVARCHAR2(50) NULL,
+    insert_dt          TIMESTAMP NOT NULL,
+    update_dt          TIMESTAMP NOT NULL,
+    CONSTRAINT dw_child_pkey PRIMARY KEY ( child_id )
+)
 TABLESPACE dw_ts_data;
 
-CREATE TABLE T_EMPLOYEES(   
-EMPLOYEE_ID     NUMBER          NOT NULL,
-CONTRACT_NUM    NUMBER          NOT NULL,
-FIRST_NAME      NVARCHAR2(50)   NOT NULL,
-LAST_NAME       NVARCHAR2(50)   NOT NULL,
-PHONE_NUMBER    NVARCHAR2(50)   NULL,
-EMAIL           NVARCHAR2(50)   NULL,
-INSERT_DT       TIMESTAMP            NOT NULL, 
-UPDATE_DT       TIMESTAMP            NOT NULL,
-CONSTRAINT DW_EMPLOYEE_PKEY PRIMARY KEY (EMPLOYEE_ID))
-TABLESPACE dw_ts_data ;
-
-CREATE TABLE T_KINDERGARTEN(
-KINDERGARTEN_ID NUMBER          NOT NULL,
-KINDERGARTEN_DESC NVARCHAR2(50)   NOT NULL, --kindergarten
-INSERT_DT       TIMESTAMP            NOT NULL, 
-UPDATE_DT       TIMESTAMP            NOT NULL,
-CONSTRAINT DW_GROUP_PKEY PRIMARY KEY (KINDERGARTEN_ID)
-)TABLESPACE dw_ts_data;
- 
-CREATE TABLE T_GROUPS(   
-GROUP_ID        NUMBER          NOT NULL,
-GROUP_NUM       NUMBER         NOT NULL,
-GROUP_DESC      NVARCHAR2(50)   NOT NULL, --kindergarten_groups
-GROUP_SCALE     NUMBER(*,0)     NOT NULL,
-INSERT_DT       TIMESTAMP       NOT NULL, 
-UPDATE_DT       TIMESTAMP       NOT NULL,
-CONSTRAINT DW_GROUPS_PKEY PRIMARY KEY (GROUP_ID)
-)TABLESPACE dw_ts_data; 
-
-CREATE TABLE T_LINKS_KID_GROUPS
-(GROUP_ID        NUMBER          NOT NULL,
-KINDERGARTEN_ID NUMBER          NOT NULL,
-INSERT_DT       TIMESTAMP          NOT NULL, 
-UPDATE_DT       TIMESTAMP            NOT NULL)
+CREATE TABLE t_employees (
+    employee_id   NUMBER NOT NULL,
+    contract_num  NUMBER NOT NULL,
+    first_name    NVARCHAR2(50) NOT NULL,
+    last_name     NVARCHAR2(50) NOT NULL,
+    phone_number  NVARCHAR2(50) NULL,
+    email         NVARCHAR2(50) NULL,
+    insert_dt     TIMESTAMP NOT NULL,
+    update_dt     TIMESTAMP NOT NULL,
+    CONSTRAINT dw_employee_pkey PRIMARY KEY ( employee_id )
+)
 TABLESPACE dw_ts_data;
 
-CREATE TABLE T_TYPES(
-TYPE_ID             NUMBER      NOT NULL,
-TYPE_DESC           NVARCHAR2(50) NOT NULL,--type
-INSERT_DT       TIMESTAMP           NOT NULL, 
-UPDATE_DT       TIMESTAMP           NOT NULL,
-CONSTRAINT DE_SERVICE_SCD_PKEY PRIMARY KEY (TYPE_ID))
-TABLESPACE dw_ts_data; 
+CREATE TABLE t_kindergarten (
+    kindergarten_id    NUMBER NOT NULL,
+    kindergarten_desc  NVARCHAR2(50) NOT NULL, --kindergarten
+    insert_dt          TIMESTAMP NOT NULL,
+    update_dt          TIMESTAMP NOT NULL,
+    CONSTRAINT dw_group_pkey PRIMARY KEY ( kindergarten_id )
+)
+TABLESPACE dw_ts_data;
 
-CREATE TABLE T_SERVICES_SCD(
-SERVICE_ID          NUMBER      NOT NULL,
-SERVICE_DESC        NVARCHAR2(50) NOT NULL,--service
-SERVICE_COST        FLOAT       NOT NULL,
-START_FROM          DATE        NOT NULL, 
-INSERT_DT      TIMESTAMP         NOT NULL, 
-UPDATE_DT      TIMESTAMP          NOT NULL)
-TABLESPACE dw_ts_data; 
+CREATE TABLE t_groups (
+    group_id     NUMBER NOT NULL,
+    group_num    NUMBER NOT NULL,
+    group_desc   NVARCHAR2(50) NOT NULL, --kindergarten_groups
+    group_scale  NUMBER(*, 0) NOT NULL,
+    insert_dt    TIMESTAMP NOT NULL,
+    update_dt    TIMESTAMP NOT NULL,
+    CONSTRAINT dw_groups_pkey PRIMARY KEY ( group_id )
+)
+TABLESPACE dw_ts_data;
 
-CREATE TABLE T_LINKS_SERVICE_TYPES
-(SERVICE_ID          NUMBER      NOT NULL,
-TYPE_ID             NUMBER      NOT NULL,
-START_FROM          DATE        NOT NULL)
-TABLESPACE dw_ts_data; 
+CREATE TABLE t_links_kid_groups (
+    group_id         NUMBER NOT NULL,
+    kindergarten_id  NUMBER NOT NULL,
+    insert_dt        TIMESTAMP NOT NULL,
+    update_dt        TIMESTAMP NOT NULL
+)
+TABLESPACE dw_ts_data;
 
-CREATE TABLE T_SERVICES(   
-SERVICE_ID      NUMBER          NOT NULL,
-SERVICE_DESC    NVARCHAR2(50)   NOT NULL,
-INSERT_DT       TIMESTAMP           NOT NULL, 
-UPDATE_DT       TIMESTAMP            NOT NULL
-)TABLESPACE dw_ts_data; 
+CREATE TABLE t_types (
+    type_id    NUMBER NOT NULL,
+    type_desc  NVARCHAR2(50) NOT NULL,--type
+    insert_dt  TIMESTAMP NOT NULL,
+    update_dt  TIMESTAMP NOT NULL,
+    CONSTRAINT de_service_scd_pkey PRIMARY KEY ( type_id )
+)
+TABLESPACE dw_ts_data;
 
+CREATE TABLE t_services_scd (
+    service_id    NUMBER NOT NULL,
+    service_code  NUMBER NOT NULL,
+    service_desc  NVARCHAR2(50) NOT NULL,--service
+    service_cost  FLOAT NOT NULL,
+    start_from    DATE NOT NULL,
+    insert_dt     TIMESTAMP NOT NULL,
+    update_dt     TIMESTAMP NOT NULL
+)
+TABLESPACE dw_ts_data;
 
-CREATE SEQUENCE DW_KINDERGARTEN_ID_seq; 
-CREATE SEQUENCE DW_TYPE_ID_seq ;
-CREATE SEQUENCE DW_children_id_seq; 
-CREATE SEQUENCE DW_group_id_seq ;
-CREATE SEQUENCE DW_employee_id_seq ;
-CREATE SEQUENCE DW_service_id_seq  ; 
+CREATE TABLE t_links_service_types (
+    service_id  NUMBER NOT NULL,
+    type_id     NUMBER NOT NULL,
+    start_from  DATE NOT NULL
+)
+TABLESPACE dw_ts_data;
+
+CREATE TABLE t_services (
+    service_id    NUMBER NOT NULL,
+    service_code  NUMBER NOT NULL,
+    insert_dt     TIMESTAMP NOT NULL,
+    update_dt     TIMESTAMP NOT NULL
+)
+TABLESPACE dw_ts_data;
+
+CREATE SEQUENCE dw_kindergarten_id_seq;
+
+CREATE SEQUENCE dw_type_id_seq;
+
+CREATE SEQUENCE dw_children_id_seq;
+
+CREATE SEQUENCE dw_group_id_seq;
+
+CREATE SEQUENCE dw_employee_id_seq;
+
+CREATE SEQUENCE dw_service_id_seq;

@@ -31,7 +31,7 @@ ALTER TABLE sa_kindergarten ADD (group_num NUMBER);
 UPDATE sa_kindergarten SET group_num = sa_kindergarten_id_seq.NEXTVAL;
 
 create table sa_service_type( -- import data from services.xlxs to generate data about services 
-active_date            date,
+sevice_code     number,
 service        NVARCHAR2(50),
 type            NVARCHAR2(50),
 service_cost    float);
@@ -122,19 +122,11 @@ WITH cte_rnd AS (
         ,floor(dbms_random.value(1, 50000)) contract_num
         ,floor(dbms_random.value(1, 1500)) emp_contract_num
         ,floor(dbms_random.value(1, 100))group_num
-        ,floor(dbms_random.value(1, 100))service
+        ,floor(dbms_random.value(1000, 1080))service_code
 FROM
         dual
     CONNECT BY
-        level < 2000000 ) 
-,cte_services AS (
-    SELECT /* +sa_service_typeMATERIALIZE*/
-                z.*,
-        ROW_NUMBER()
-        OVER(PARTITION BY 1
-             ORDER BY service
-        ) AS rn
-from sa_service_type z)
+        level < 4000000 ) 
 select  rownum attendance_num
         ,date_attendance
         ,child_name
@@ -143,11 +135,11 @@ select  rownum attendance_num
         ,emp_lastname
         ,kindergarten_groups
         ,kindergarten
-        ,y.service
+        ,a.service_code
 from cte_rnd a
 inner join sa_contracts b on a.contract_num=b.contract_num
 inner join sa_emp_contracts c on a.emp_contract_num = c.contract_num
 inner join sa_kindergarten q on q.group_num=a.group_num
-inner join cte_services y  ON y.rn = a.service;
+inner join sa_service_type y  ON y.sevice_code = a.service_code;
         
 ALTER TABLE sa_attendances MOVE TABLESPACE ts_sa_attendances;        

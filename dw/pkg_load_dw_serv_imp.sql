@@ -1,209 +1,182 @@
-CREATE OR REPLACE PACKAGE BODY pkg_load_dw_serv 
-AS 
+CREATE OR REPLACE PACKAGE BODY pkg_load_dw_serv AS
 
-procedure load_dw_serv as
-   BEGIN DELETE FROM t_services lng
-WHERE
-    lng.SERVICE_DESC NOT IN (
-        SELECT DISTINCT
-            upper(service_desc) 
-        FROM
-            dw_ls_groups
-    );MERGE INTO T_SERVICES k USING ( SELECT DISTINCT
-    upper(service_desc) AS s_desc
-FROM
-    dw_ls_services) ck
-              ON ( k.service_desc = ck.s_desc )
-      WHEN NOT MATCHED THEN
-         INSERT            ( SERVICE_ID
-                            ,SERVICE_DESC 
-                           ,INSERT_DT    
-                            ,UPDATE_DT)
-             VALUES ( DW_service_id_seq.NEXTVAL
-                    ,ck.s_desc
-                    ,CURRENT_TIMESTAMP
-                    ,CURRENT_TIMESTAMP);
-      --Commit Data
-      COMMIT;
-   END load_dw_serv;
-   
-PROCEDURE load_dw_types as
-   BEGIN DELETE FROM t_types lng
-WHERE
-    lng.type_DESC NOT IN (
-        SELECT DISTINCT
-            upper(type_desc) 
-        FROM
-            dw_ls_groups
-    );MERGE INTO T_TYPES k USING ( SELECT DISTINCT
-    upper(type_desc) AS t_desc
-FROM
-    dw_ls_services) ck
-              ON ( k.type_desc = ck.t_desc )
-      WHEN NOT MATCHED THEN
-         INSERT            ( TYPE_ID
-                            ,TYPE_DESC 
-                           ,INSERT_DT    
-                            ,UPDATE_DT)
-             VALUES ( DW_TYPE_ID_seq.NEXTVAL
-                    ,ck.t_desc
-                    ,CURRENT_TIMESTAMP
-                    ,CURRENT_TIMESTAMP);
-      --Commit Data
-      COMMIT;
-   END load_dw_types;
-   
-procedure load_dw_serv_link as
-   BEGIN 
-   DELETE FROM T_LINKS_SERVICE_TYPES lng
-WHERE
-    lng.SERVICE_ID NOT IN (
-        SELECT SERVICE_ID
-        FROM   t_services)
-and lng.TYPE_ID not in(select distinct TYPE_ID  from t_types);
-   MERGE INTO T_LINKS_SERVICE_TYPES trg
-           USING (SELECT distinct SERVICE_ID 
-                       , TYPE_ID
-                       ,start_date
-                    FROM 
-                       dw_ls_services ls
-                       ,t_services ts
-                       ,t_types tt
-                   WHERE TYPE_ID IS NOT NULL
-                     AND  upper(ls.service_desc)=ts.service_desc
-                     AND  upper(ls.type_desc)=tt.type_desc) kk
-                     ON ( trg.SERVICE_ID = kk.SERVICE_ID
-              AND trg.TYPE_ID = kk.TYPE_ID )
-      WHEN NOT MATCHED THEN
-         INSERT ( SERVICE_ID,
-                TYPE_ID,
-                START_FROM)
-             VALUES ( kk.SERVICE_ID,
-                    kk.TYPE_ID,
-                    start_date );
-      COMMIT;
-   END load_dw_serv_link;
- 
-procedure load_dw_serv_scd 
-as   
-   BEGIN 
-   DELETE FROM T_SERVICES_SCD lng
-WHERE
-    lng.SERVICE_ID NOT IN (
-        SELECT SERVICE_ID
-        FROM   t_services)
-and lng.TYPE_ID not in(select TYPE_ID  from t_types);
-   MERGE INTO T_SERVICES_SCD trg
-           USING (SELECT distinct ts.SERVICE_ID,
-                                ts.SERVICE_DESC,
-                                cl.SERVICE_COST,
-                                cl.start_date
-                    FROM 
-                       t_services ts
-                       ,dw_ls_services cl
-                   WHERE 
-                     upper(cl.service_desc)=ts.service_desc) kk
-                     ON ( trg.SERVICE_ID = kk.SERVICE_ID
-                     and trg.START_FROM=kk.start_date)
-      WHEN NOT MATCHED THEN
-         INSERT ( SERVICE_ID,
-                                SERVICE_DESC,
-                                SERVICE_COST,
-                                START_FROM,
-                                INSERT_DT,
-                                UPDATE_DT)
-             VALUES ( kk.SERVICE_ID,
-                    kk.SERVICE_DESC,
-                    kk.SERVICE_COST,
-                    kk.start_date, 
-                    CURRENT_TIMESTAMP,
-                    CURRENT_TIMESTAMP);
-END load_dw_serv_scd;   
-   
-   
-END pkg_load_dw_serv;
-
-
-
-
-
-
-/*AS
- BEGIN
-     EXECUTE IMMEDIATE 'TRUNCATE TABLE T_GROUPS';
-    DECLARE
-        TYPE var_cur IS TABLE OF varchar2(50);
-        TYPE num_cur IS TABLE OF number;
-        TYPE all_cur is REF CURSOR;
-        ls_at all_cur; 
-        
-            GROUP_NUM num_cur;
-            GROUP_DESC var_cur;
-            GROUP_SCALE num_cur;
-       BEGIN
-       open ls_at   FOR
-        SELECT DISTINCT
-            GROUP_NUM,
-            GROUP_DESC,
-            GROUP_SCALE
-        FROM dw_ls_groups
+    PROCEDURE load_dw_serv AS
+    BEGIN
+        DELETE FROM t_services lng
         WHERE
-         group_num IS NOT NULL
-         AND GROUP_DESC IS NOT NULL
-         AND group_scale IS NOT NULL;
-       fetch  ls_at
-       BULK COLLECT INTO GROUP_NUM,GROUP_DESC,GROUP_SCALE;
-       close ls_at;
-        
-         
-        forall i IN group_num.FIRST..group_num.LAST
-	         INSERT INTO T_GROUPS (GROUP_ID,
-                                GROUP_NUM,
-                                GROUP_DESC,
-                                GROUP_SCALE,
-                                INSERT_DT,    
-                                UPDATE_DT)
-        VALUES ( dw_group_id_seq.NEXTVAL
-	                     , GROUP_NUM(i)
-                            ,group_desc(i)
-                            ,group_scale(i)
-                            ,current_timestamp
-                            ,current_timestamp );   
-                            COMMIT;
---END IF;
-	  -- END loop;
-    end;
-END load_dw_groups;
+            lng.service_code NOT IN (
+                SELECT DISTINCT
+                    service_code
+                FROM
+                    dw_ls_groups
+            );
 
-procedure load_dw_kinder_link as
-   BEGIN 
-   DELETE FROM T_LINKS_KID_GROUPS lng
-WHERE
-    lng.KINDERGARTEN_ID NOT IN (
-        SELECT KINDERGARTEN_ID
-        FROM   t_kindergarten)
-and lng.GROUP_ID not in(select distinct group_id  from t_groups);
-   MERGE INTO T_LINKS_KID_GROUPS trg
-           USING (SELECT distinct GROUP_ID 
-                       , KINDERGARTEN_ID 
-                    FROM 
-                       dw_ls_groups lg
-                       , t_kindergarten tk
-                       ,t_groups tg
-                   WHERE GROUP_ID IS NOT NULL
-                     AND  upper(lg.kindergarten_desc)=tk.kindergarten_desc
-                     AND tg.group_num=lg.group_num) kk
-                     ON ( trg.GROUP_ID = kk.GROUP_ID
-              AND trg.KINDERGARTEN_ID = kk.KINDERGARTEN_ID )
-      WHEN NOT MATCHED THEN
-         INSERT            ( GROUP_ID,
-                            KINDERGARTEN_ID,
-                            INSERT_DT, 
-                            UPDATE_DT)
-             VALUES ( kk.GROUP_ID,
-                    kk.KINDERGARTEN_ID,
-                    current_timestamp,
-                    current_timestamp );
-      COMMIT;
-   END load_dw_kinder_link;
-END pkg_load_dw_serv;*/
+        MERGE INTO t_services k
+        USING (
+                  SELECT DISTINCT
+                      service_code AS s_desc
+                  FROM
+                      dw_ls_services
+              )
+        ck ON ( k.service_code = ck.s_desc )
+        WHEN NOT MATCHED THEN
+        INSERT (
+            service_id,
+            service_code,
+            insert_dt,
+            update_dt )
+        VALUES
+            ( dw_service_id_seq.NEXTVAL,
+            ck.s_desc,
+            current_timestamp,
+            current_timestamp );
+      --Commit Data
+              COMMIT;
+    END load_dw_serv;
+
+    PROCEDURE load_dw_types AS
+    BEGIN
+        DELETE FROM t_types lng
+        WHERE
+            lng.type_desc NOT IN (
+                SELECT DISTINCT
+                    upper(type_desc)
+                FROM
+                    dw_ls_groups
+            );
+
+        MERGE INTO t_types k
+        USING (
+                  SELECT DISTINCT
+                      upper(type_desc) AS t_desc
+                  FROM
+                      dw_ls_services
+              )
+        ck ON ( k.type_desc = ck.t_desc )
+        WHEN NOT MATCHED THEN
+        INSERT (
+            type_id,
+            type_desc,
+            insert_dt,
+            update_dt )
+        VALUES
+            ( dw_type_id_seq.NEXTVAL,
+            ck.t_desc,
+            current_timestamp,
+            current_timestamp );
+      --Commit Data
+              COMMIT;
+    END load_dw_types;
+    
+        PROCEDURE load_dw_serv_scd AS
+    BEGIN
+        DELETE FROM t_services_scd lng
+        WHERE
+            lng.service_id NOT IN (
+                SELECT
+                    service_id
+                FROM
+                    t_services
+            );
+
+        MERGE INTO t_services_scd trg
+        USING (
+                  SELECT
+                      service_id,
+                      service_code,
+                      service_desc,
+                      service_cost,
+                      MIN(start_date) start_date
+                  FROM
+                      (
+                          SELECT DISTINCT
+                              ts.service_id,
+                              ts.service_code,
+                              service_desc,
+                              service_cost,
+                              type_desc,
+                              cl.date_attendance start_date
+                          FROM
+                                   dw_ls_attendances cl
+                              INNER JOIN t_services      ts ON cl.service_code = ts.service_code
+                              INNER JOIN dw_ls_services  ls ON ls.service_code = ts.service_code
+                      ) t1
+                  GROUP BY
+                      service_id,
+                      service_code,
+                      service_desc,
+                      service_cost,
+                      type_desc
+              )
+        kk ON ( trg.service_id = kk.service_id )
+        WHEN MATCHED THEN UPDATE
+        SET start_from = current_timestamp
+        WHEN NOT MATCHED THEN
+        INSERT (
+            service_id,
+            service_code,
+            service_desc,
+            service_cost,
+            start_from,
+            insert_dt,
+            update_dt )
+        VALUES
+            ( kk.service_id,
+              kk.service_code,
+              kk.service_desc,
+              kk.service_cost,
+              kk.start_date,
+              current_timestamp,
+              current_timestamp );
+
+    END load_dw_serv_scd;
+
+    PROCEDURE load_dw_serv_link AS
+    BEGIN
+        DELETE FROM t_links_service_types lng
+        WHERE
+            lng.service_id NOT IN (
+                SELECT
+                    service_id
+                FROM
+                    t_services
+            )
+            AND lng.type_id NOT IN (
+                SELECT DISTINCT
+                    type_id
+                FROM
+                    t_types
+            );
+
+        MERGE INTO t_links_service_types trg
+        USING (
+                  SELECT DISTINCT
+                      service_id,
+                      type_id,
+                      start_from
+                      
+                  FROM
+                      dw_ls_services  ls,
+                      t_services_scd      ts,
+                      t_types         tt
+                  WHERE
+                      type_id IS NOT NULL
+                      AND ls.service_code = ts.service_code
+                      AND upper(ls.type_desc) = tt.type_desc
+              )
+        kk ON ( trg.service_id = kk.service_id
+                AND trg.type_id = kk.type_id )
+        WHEN NOT MATCHED THEN
+        INSERT (
+            service_id,
+            type_id,
+            start_from )
+        VALUES
+            ( kk.service_id,
+              kk.type_id,
+              kk.start_from );
+
+        COMMIT;
+    END load_dw_serv_link;
+
+END pkg_load_dw_serv;
