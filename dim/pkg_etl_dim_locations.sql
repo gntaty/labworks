@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_etl_dim_loc AS
                       loc.group_desc
                   FROM
                       u_dw_references.location    loc
-                      LEFT JOIN dw_ls_groups cls ON upper(loc.country_desc) = upper(cls.country)
+                      LEFT JOIN t_addresses cls ON upper(loc.country_desc) = upper(cls.country)
               )
         cls ON ( trg.country_id = cls.country_id)
         WHEN NOT MATCHED THEN
