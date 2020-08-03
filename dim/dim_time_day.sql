@@ -3,7 +3,8 @@ CREATE TABLE dim_time_day
         SELECT
             CAST((to_char(sd + rn, 'YYYY')
                   || to_char(sd + rn, 'MM')
-                  || to_char(sd + rn, 'DD')) AS INTEGER)                                             event_dt,
+                  || to_char(sd + rn, 'DD')) AS INTEGER)                                            event_dt,
+            trunc(sd + rn)                                                                  time_id,
             to_char(sd + rn, 'fmDay')                                                         day_name,
             to_char(sd + rn, 'D')                                                             day_number_in_week,
             to_char(sd + rn, 'DD')                                                            day_number_in_month,
