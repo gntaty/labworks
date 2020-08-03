@@ -19,7 +19,7 @@ SIZE 150M
  
  CREATE TABLESPACE dw_ts_fact
 datafile '/oracle/u01/app/oracle/oradata/DCORCL/pdb_tgnezdilova/dw_ts_fact.dat'
-SIZE 500M
+SIZE 700M
  AUTOEXTEND ON NEXT 200M
  SEGMENT SPACE MANAGEMENT AUTO; 
  
