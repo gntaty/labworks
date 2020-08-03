@@ -80,6 +80,24 @@ CREATE TABLE t_groups (
 )
 TABLESPACE dw_ts_data;
 
+CREATE TABLE t_addresses (
+    address_id    NUMBER NOT NULL,
+    address            NVARCHAR2(100) NOT NULL,
+    city               NVARCHAR2(50) NOT NULL,
+    country            NVARCHAR2(50) NOT NULL,
+    insert_dt     TIMESTAMP NOT NULL,
+    update_dt     TIMESTAMP NOT NULL
+)
+TABLESPACE dw_ts_data;
+
+CREATE TABLE t_links_kind_addresses (
+    address_id    NUMBER NOT NULL,
+    kindergarten_id    NUMBER NOT NULL,
+    insert_dt     TIMESTAMP NOT NULL,
+    update_dt     TIMESTAMP NOT NULL
+)
+TABLESPACE dw_ts_data;
+
 CREATE TABLE t_links_kid_groups (
     group_id         NUMBER NOT NULL,
     kindergarten_id  NUMBER NOT NULL,
@@ -122,6 +140,8 @@ CREATE TABLE t_services (
     update_dt     TIMESTAMP NOT NULL
 )
 TABLESPACE dw_ts_data;
+
+CREATE SEQUENCE dw_addresses_id_seq;
 
 CREATE SEQUENCE dw_kindergarten_id_seq;
 
