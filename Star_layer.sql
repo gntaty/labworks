@@ -1,18 +1,18 @@
-DROP TABLE dim_children;
+DROP TABLE dim_children CASCADE CONSTRAINTS;
 
-DROP TABLE dim_employees;
+DROP TABLE dim_employees CASCADE CONSTRAINTS;
 
-DROP TABLE dim_gen_services_scd;
+DROP TABLE dim_gen_services_scd CASCADE CONSTRAINTS;
 
-DROP TABLE dim_groups;
+DROP TABLE dim_groups CASCADE CONSTRAINTS;
 
-DROP TABLE dim_time_day;
+DROP TABLE dim_time_day CASCADE CONSTRAINTS;
 
-DROP TABLE dim_locations;
+DROP TABLE dim_locations CASCADE CONSTRAINTS;
 
-DROP TABLE fct_attendances_dd;
+DROP TABLE fct_attendances_dd CASCADE CONSTRAINTS;
 
-DROP TABLE dim_gen_services_act;
+DROP TABLE dim_gen_services_act CASCADE CONSTRAINTS;
 
 CREATE TABLE dim_children (
     child_id           NUMBER NOT NULL,
@@ -74,6 +74,7 @@ TABLESPACE dw_ts_dims;
 
 CREATE TABLE dim_locations (
     location_id       NUMBER NOT NULL,
+    address_id        NUMBER NULL,
     street            NVARCHAR2(100) NULL,
     city              VARCHAR2(50) NULL,
     country_id        NUMBER NOT NULL,
@@ -98,15 +99,15 @@ CREATE TABLE dim_locations (
 TABLESPACE dw_ts_dims;
 
 CREATE TABLE fct_attendances_dd ( -- create facts table 
-     event_dt             NUMBER NOT NULL,
+         event_dt             NUMBER NOT NULL,
     child_id             NUMBER NOT NULL,
     employee_id          NUMBER NOT NULL,
     service_surr_id      NUMBER NOT NULL,
-    group_id             NUMBER NOT NULL,
+    k_group_id           NUMBER NOT NULL,
     location_id          NUMBER NOT NULL,
     cnt_services         NUMBER NOT NULL,
-    tot_amoumt_services  FLOAT NOT NULL,
-    visit_ratio          FLOAT NOT NULL,
+    tot_amoumt_services  NUMBER NOT NULL,
+    visit_ratio          VARCHAR2(50) NOT NULL,
     insert_dt            DATE NOT NULL,
     update_dt            DATE NOT NULL
 )
@@ -119,7 +120,7 @@ ALTER TABLE fct_attendances_dd
             ON DELETE CASCADE;
 
 ALTER TABLE fct_attendances_dd
-    ADD CONSTRAINT group_id_fkey FOREIGN KEY ( group_id )
+    ADD CONSTRAINT group_id_fkey FOREIGN KEY ( t_group_id )
         REFERENCES dim_groups ( group_id )
             ON DELETE CASCADE;
 
